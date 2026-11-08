@@ -1,0 +1,4 @@
+__pycache__/ 
+*.pyc
+.DS_Store pgdata_ot/ 
+grafanadata_ot/

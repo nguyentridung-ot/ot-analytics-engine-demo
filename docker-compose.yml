@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres_ot:
+    image: postgres:16-alpine
+    container_name: postgres_ot_engine
+    restart: always
+    environment:
+      POSTGRES_DB: ot_analytics_db
+      POSTGRES_USER: ot_admin
+      POSTGRES_PASSWORD: ot_password_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_ot:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ot_admin -d ot_analytics_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana_ot:
+    image: grafana/grafana-oss:latest
+    container_name: grafana_control_room
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana_password_2026
+    depends_on:
+      postgres_ot:
+        condition: service_healthy
+    volumes:
+      - grafanadata_ot:/var/lib/grafana
+
+volumes:
+  pgdata_ot:
+  grafanadata_ot:
